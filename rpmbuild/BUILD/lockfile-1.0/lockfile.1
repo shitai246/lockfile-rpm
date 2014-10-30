@@ -1,6 +1,9 @@
-ロックファイル制御スクリプト。
-
-他のスクリプトから呼び出すことで、呼び出し元スクリプトのロックファイルを制御する。
-
-lockfile -c でロックファイルの存在確認・ロックファイル作成。ロックファイルがあった場合にはexit.
-lockfile -r でロックファイルを消去。
+Usage : 
+  ./lockfile
+    -c : check lockfile
+         Will be Kill the calling process, when the lock file exists
+          and proccess id is alive to lock file written.
+         if lockfile check is ok, create lock file and write to the id of calling proccess.
+    -r : remove lockfile
+    -f : specify the lock file name.
+          Default is '/tmp/.{command of calling proccess}.lock'.

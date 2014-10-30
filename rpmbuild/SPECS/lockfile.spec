@@ -13,15 +13,11 @@ lockfile
 
 %prep
 rm -rf $RPM_BUILD_ROOT/*
-mkdir -p $RPM_BUILD_ROOT/usr/local/{bin,man/man1}
 
 %setup
 
-#%build
-#make
-
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/local/bin $RPM_BUILD_ROOT/usr/local/man/man1
+mkdir -p $RPM_BUILD_ROOT/usr/local/{bin,man/man1}
 cp lockfile $RPM_BUILD_ROOT/usr/local/bin
 cp lockfile.1 $RPM_BUILD_ROOT/usr/local/man/man1
 

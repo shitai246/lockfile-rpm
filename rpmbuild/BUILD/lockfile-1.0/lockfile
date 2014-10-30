@@ -10,7 +10,15 @@
 
 # usage
 function usage() {
-  echo "Usage : あとで書く"
+  echo "Usage : "
+  echo "  $0"
+  echo "    -c : check lockfile"
+  echo "         Will be Kill the calling process, when the lock file exists"
+  echo "          and proccess id is alive to lock file written."
+  echo "         if lockfile check is ok, create lock file and write to the id of calling proccess."
+  echo "    -r : remove lockfile"
+  echo "    -f : specify the lock file name."
+  echo "          Default is '/tmp/.{command of calling proccess}.lock'."
 }
 
 ## メイン処理
@@ -30,6 +38,11 @@ _PPID=`ps -o ppid -p ${_PID} | tail -1`
 _PCOMM=`ps -o comm -p ${_PPID} | tail -1`
 _COMM_LENGTH=`expr ${#_PCOMM} + 2`
 _PCMD=`ps -o command -p ${_PPID} | tail -1 | cut -c ${_COMM_LENGTH}- | awk '{print $1}'`
+
+if [ "${_PCMD}" == "" ]; then
+  usage
+  exit 1;
+fi
 
 if [ "${_LOCK_F}" == "TRUE" ]; then
   _LOCKFILE="/tmp/.${_LOCKFILENAME}"
