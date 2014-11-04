@@ -14,3 +14,14 @@ gpgcheck=0
 ## Install
 `yum install lockfile`
 
+
+## Usage
+
+This can lock file control in such as a batch program.
+
+* check and create lock file
+  your batch program call `lockfile -c`
+* remove lock file
+  your batch progra call `lockfile -r`
+
+
