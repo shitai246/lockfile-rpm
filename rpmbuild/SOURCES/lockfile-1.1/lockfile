@@ -1,0 +1,85 @@
+#!/bin/sh
+
+# ロックファイルの有無をチェックする。
+# ロックファイルがあればファイルに記載された値のプロセスがあるか確認し、
+# プロセスがあればロックが有効とし処理を終了する。
+# ロックが有効でないときは、自分のプロセスIDをロックファイルに書き出す。
+#
+# ロックファイル名は /tmp/.{呼出し元のコマンド名}.lock とする
+#
+
+# usage
+function usage() {
+  echo "Usage : "
+  echo "  $0"
+  echo "    -c : check lockfile"
+  echo "         Will be kill the calling process, when the lock file exists"
+  echo "          and proccess id is alive to lock file written."
+  echo "         if lockfile check is ok, create lock file and write to the id of calling proccess."
+  echo "    -o : check only flg"
+  echo "         Does not kill the calling process, when the lockfile exists."
+  echo "         You can check return code."
+  echo "           0: lock is not exists."
+  echo "           1: lock is exists."
+  echo "           2: param error."
+  echo "    -r : remove lockfile"
+  echo "    -f : specify the lock file name."
+  echo "          Default is '/tmp/.{command of calling proccess}.lock'."
+  echo "          '/' is converted to '_' and space converted to '-',  that is included in the command."
+}
+
+## メイン処理
+# オプション解析
+while getopts corf: OPT
+do
+  case $OPT in
+    "c" ) _CHECK_F="TRUE" ;;
+    "o" ) _CHECK_ONLY_F="TRUE" ;;
+    "r" ) _REMOVE_F="TRUE" ;;
+    "f" ) _LOCK_F="TRUE" ; _LOCKFILENAME="${OPTARG}" ;;
+  esac
+done
+
+
+_PID=${$}
+_PPID=`ps -o ppid -p ${_PID} | tail -1`
+_PCOMM=`ps -o comm -p ${_PPID} | tail -1`
+_PCMD=`ps -o command -p ${_PPID} | tail -1`
+
+if [ "${_PCMD}" == "" ]; then
+  usage
+  exit 2;
+fi
+
+if [ "${_LOCK_F}" == "TRUE" ]; then
+  _LOCKFILE="/tmp/.${_LOCKFILENAME}"
+else
+  _LOCKFILE="/tmp/.`echo "${_PCMD}" | sed -e 's/ /-/g' | sed -e 's/\//_/g'`.lock"
+fi
+
+if [ "${_CHECK_F}" == "TRUE" ]; then
+  if [ -f ${_LOCKFILE} ]; then
+    _LOCK_PID=`cat ${_LOCKFILE}`
+    if [ "${_LOCK_PID}" == "${_PPID}" ]; then
+      # 同じ呼出し元から2回呼ばれていたら処理を行わない
+      exit 0;
+    fi
+    kill -0 ${_LOCK_PID} 2> /dev/null
+    if [ "$?" == "0" ]; then
+      echo "logWarn ${_PCMD} is running."
+      if [ "${_CHECK_ONLY_F}" != "TRUE" ]; then
+        kill -9 ${_PPID}
+      fi
+      exit 1;
+    fi
+  fi
+  echo ${_PPID} > ${_LOCKFILE}
+elif [ "${_REMOVE_F}" == "TRUE" ]; then
+  rm -f ${_LOCKFILE}
+else
+  usage
+  exit 2;
+fi
+
+exit 0;
+

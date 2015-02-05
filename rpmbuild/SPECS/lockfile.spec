@@ -1,8 +1,8 @@
 Name: lockfile
-Version: 1.0
+Version: 1.1
 Release: 0
 Group: Utilities
-Source: lockfile-1.0.tar.gz
+Source: lockfile-1.1.tar.gz
 Summary: lock file controller
 Packager: Taisuke Shiratori
 License: MIT License
