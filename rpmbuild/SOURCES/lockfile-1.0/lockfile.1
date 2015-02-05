@@ -1,9 +1,16 @@
 Usage : 
   ./lockfile
     -c : check lockfile
-         Will be Kill the calling process, when the lock file exists
+         Will be kill the calling process, when the lock file exists
           and proccess id is alive to lock file written.
          if lockfile check is ok, create lock file and write to the id of calling proccess.
+    -o : check only flg
+         Does not kill the calling process, when the lockfile exists.
+         You can check return code.
+           0: lock is not exists.
+           1: lock is exists.
+           2: param error.
     -r : remove lockfile
     -f : specify the lock file name.
           Default is '/tmp/.{command of calling proccess}.lock'.
+          '/' is converted to '_' and space converted to '-',  that is included in the command.
